@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="debug" monitorInterval="10">
+
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+		<File name="file" fileName="mangalib-back.log">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n" />
+		</File>
+	</Appenders>
+
+	<Loggers>
+		<Root level="INFO" additivity="true">
+			<AppenderRef ref="Console" />
+		</Root>
+
+		<Logger name="net.poulp" level="DEBUG" additivity="true">
+			<AppenderRef ref="file" />
+		</Logger>
+	</Loggers>
+
+</Configuration>
