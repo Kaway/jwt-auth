@@ -38,7 +38,7 @@ public class JwtAuthenticationTokenFilter extends GenericFilterBean {
 
         final Optional<String> token = Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION));
 
-        Authentication authentication = null;
+        Authentication authentication;
 
         if(token.isPresent()) {
 
@@ -49,14 +49,14 @@ public class JwtAuthenticationTokenFilter extends GenericFilterBean {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "jwt.expired");
                 return;
             } catch (Exception exception) {
-                SecurityContextHolder.getContext().setAuthentication(null);
+                authentication = null;
             }
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         chain.doFilter(servletRequest, servletResponse);
-        SecurityContextHolder.getContext().setAuthentication(null); // Clean authentication after process
+        SecurityContextHolder.getContext().setAuthentication(null); // Clear authentication after process
 
     }
 

@@ -21,8 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/api")
 public class AuthenticationController {
 
-    private static final String JWT_TOKEN_HEADER_NAME = "X-AUTH-TOKEN";
-
     @Autowired
     private AuthenticationService authenticationService;
 
@@ -39,16 +37,6 @@ public class AuthenticationController {
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
-    }
-
-    @PostMapping(value = "/auth/refresh")
-    public ResponseEntity<String> refreshToken(@RequestBody RefreshToken refreshToken) {
-        try {
-            String jwtToken = jwtTokenService.refreshJwtToken(refreshToken.token);
-            return ResponseEntity.ok().header(JWT_TOKEN_HEADER_NAME, jwtToken).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
     }
 
 }

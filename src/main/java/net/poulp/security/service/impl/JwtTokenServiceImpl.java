@@ -21,19 +21,13 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     @Value("${token.secret}")
     private String secret;
 
-    @Autowired
-    private UserDetailsService userService;
-
     @Override
     public JwtTokens createTokens(Authentication authentication) {
 
-        String token, refreshToken;
-        UserDto user = (UserDto) authentication.getPrincipal();
-
+        String token;
         token = createToken((UserDto) authentication.getPrincipal());
-        refreshToken = createRefreshToken(user);
 
-        return new JwtTokens(token, refreshToken);
+        return new JwtTokens(token);
     }
 
     @Override
@@ -41,18 +35,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, secret)
-                .setExpiration(getTokenExpirationDate(false))
-                .setIssuedAt(new Date())
-                .setClaims(buildUserClaims(user))
-                .compact();
-    }
-
-    @Override
-    public String createRefreshToken(UserDto user) {
-
-        return Jwts.builder()
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .setExpiration(getTokenExpirationDate(true))
+                .setExpiration(getTokenExpirationDate())
                 .setIssuedAt(new Date())
                 .setClaims(buildUserClaims(user))
                 .compact();
@@ -63,40 +46,10 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
     }
 
-    @Override
-    public String refreshJwtToken(String token) {
-        Jws<Claims> claims = validateJwtRefreshToken(token);
-        return createTokenFromClaims(claims);
-    }
 
-    private String createTokenFromClaims(Jws<Claims> jws) {
-
-        return Jwts.builder()
-                .setClaims(jws.getBody())
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .setExpiration(getTokenExpirationDate(false))
-                .setIssuedAt(new Date())
-                .compact();
-    }
-
-    private Jws<Claims> validateJwtRefreshToken(String token) {
-        JwtParser parser = Jwts.parser().setSigningKey(secret);
-        Jws<Claims> claims = parser.parseClaimsJws(token);
-
-        UserDto user = (UserDto) userService.loadUserByUsername(claims.getBody().getSubject());
-
-        return parser.require("salt", user.getSalt()).parseClaimsJws(token);
-    }
-
-    private Date getTokenExpirationDate(boolean refreshToken) {
+    private Date getTokenExpirationDate() {
         Calendar calendar = Calendar.getInstance();
-
-        if(refreshToken) {
-            calendar.add(Calendar.MONTH, 1);
-        } else {
-            calendar.add(Calendar.MINUTE, 5);
-        }
-
+        calendar.add(Calendar.MINUTE, 5);
         return calendar.getTime();
     }
 

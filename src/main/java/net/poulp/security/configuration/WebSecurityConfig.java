@@ -34,7 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    private JwtAuthenticationTokenFilter authenticationTokenFilterBean() {
+    public JwtAuthenticationTokenFilter authenticationTokenFilterBean() {
         return new JwtAuthenticationTokenFilter();
     }
 
@@ -44,8 +44,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
 
         http
-                //.exceptionHandling().authenticationEntryPoint(loginUrlAuthenticationEntryPoint())
-                //.and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()

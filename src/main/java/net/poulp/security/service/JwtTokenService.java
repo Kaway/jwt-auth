@@ -10,9 +10,7 @@ public interface JwtTokenService {
 
     JwtTokens createTokens(Authentication authentication);
     String createToken(UserDto user);
-    String createRefreshToken(UserDto user);
 
-    String refreshJwtToken(String token);
     Jws<Claims> validateJwtToken(String token);
 
 }
