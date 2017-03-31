@@ -1,0 +1,45 @@
+@startumlautonumberactor
+
+Client as M
+participant "Jwt Filter" as JF #green
+participant "Authentication\nController" as AC
+participant "Demo Controller" as DC
+participant "JWT Service" as JS #red
+database "Database" as DB
+
+M -> AC: Authentication Request /auth\n{"user":"user", "password":"password"}
+AC -> DB: Authenticate\nthe user
+DB --> AC: User information
+AC -> JS: Token creation request
+Activate JS
+JS --> AC: JWT Tokens for user
+Deactivate JS
+AC --> M: Authentication Response\n{"token":"token1","refreshToken":"token2"}
+M -[#green]> JF: Request: /demo [ Authorization: Bearer token1 ]
+Activate JF
+JF -[#green]> JS: Validate the JWT
+Activate JS
+JS -[#green]-> JF: User authentication
+note right: No database call !
+Deactivate JS
+JF -> DC: Let the /demo request be processed
+Deactivate JF
+DC -> M: Response
+... Other requests ...
+M -[#green]> JF: Request: /demo [ Authorization: Bearer token1 ]
+Activate JF
+JF -[#green]> JS: Validate the JWT
+Activate JS
+JS -[#green]> JF: Token expired
+Deactivate JS
+JF -[#green]> M: HTTP 401 {"error.jwt.expired"}Deactivate JF
+M -[#green]> AC: Refresh token request /auth/refresh\n {"refreshToken":"token2"}
+AC -[#green]> JS: Validate the Refresh Token
+Activate JS
+JS -> DB: Retrieve user information
+note left: Database call to retrieve the user secret
+DB -> JS: User informationJS -[#green]> JS: Validate Refresh Token\nwith user secret
+JS -[#green]> AC: New TokenDeactivate JSAC -[#green]> M: New Token\n{"token": "token1"}
+... Other requests ...
+
+@enduml
