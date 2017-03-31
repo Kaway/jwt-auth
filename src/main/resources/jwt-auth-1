@@ -7,7 +7,8 @@ participant "JWT Service" as JS #red
 database "Database" as DB
 
 M -> AC: Authentication Request\n{"user":"user", "password":"password"}
-Activate ACAC -> DB: Authenticate\nthe user
+Activate AC
+AC -> DB: Authenticate\nthe user
 DB --> AC: User information
 AC -> JS: Token creation request
 Activate JS
@@ -19,7 +20,8 @@ M -[#green]> JF: Request: /demo [ Authorization: Bearer token1 ]
 Activate JF
 JF -[#green]> JS: Validate the JWT
 Activate JS
-JS -[#green]-> JF: User authenticationnote right: No database call !
+JS -[#green]-> JF: User authentication
+note right: No database call !
 Deactivate JS
 JF -> DC: Let the /demo request be processed
 Deactivate JF
