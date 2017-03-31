@@ -12,7 +12,7 @@ public interface JwtTokenService {
     String createToken(UserDto user);
     String createRefreshToken(UserDto user);
 
-    String refreshJwtToken(String token);
+    JwtTokens refreshJwtToken(String token);
     Jws<Claims> validateJwtToken(String token);
 
 }

@@ -65,9 +65,10 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
-    public String refreshJwtToken(String token) {
-        Jws<Claims> claims = validateJwtRefreshToken(token);
-        return createTokenFromClaims(claims);
+    public JwtTokens refreshJwtToken(String refreshToken) {
+        Jws<Claims> claims = validateJwtRefreshToken(refreshToken);
+        String newToken = createTokenFromClaims(claims);
+        return new JwtTokens(newToken, refreshToken);
     }
 
     private String createTokenFromClaims(Jws<Claims> jws) {

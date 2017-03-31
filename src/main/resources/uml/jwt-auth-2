@@ -8,7 +8,7 @@ participant "Demo Controller" as DC
 participant "JWT Service" as JS #red
 database "Database" as DB
 
-M -> AC: Authentication Request /auth\n{"user":"user", "password":"password"}
+M -> AC: Authentication Request /api/auth\n{"user":"user", "password":"password"}
 AC -> DB: Authenticate\nthe user
 DB --> AC: User information
 AC -> JS: Token creation request
@@ -35,14 +35,16 @@ JS -[#green]> JF: Token expired
 Deactivate JS
 JF -[#green]> M: HTTP 401 {"error.jwt.expired"}
 Deactivate JF
-M -[#green]> AC: Refresh token request /auth/refresh\n {"refreshToken":"token2"}
+M -[#green]> AC: Refresh token request /api/auth/refresh\n {"refreshToken":"token2"}
 AC -[#green]> JS: Validate the Refresh Token
 Activate JS
 JS -> DB: Retrieve user information
 note left: Database call to retrieve the user secret
 DB -> JS: User information
 JS -[#green]> JS: Validate Refresh Token\nwith user secret
-JS -[#green]> AC: New TokenDeactivate JSAC -[#green]> M: New Token\n{"token": "token1"}
+JS -[#green]> AC: New Token
+Deactivate JS
+AC -[#green]> M: New Token\n{"token": "newToken", "refreshToken":"refreshToken"}
 ... Other requests ...
 
 @enduml

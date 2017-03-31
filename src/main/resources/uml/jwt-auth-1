@@ -9,7 +9,7 @@ participant "Demo Controller" as DC
 participant "JWT Service" as JS #red
 database "Database" as DB
 
-M -> AC: Authentication Request\n{"user":"user", "password":"password"}
+M -> AC: Authentication Request /api/auth\n{"user":"user", "password":"password"}
 Activate AC
 AC -> DB: Authenticate\nthe user
 DB --> AC: User information
