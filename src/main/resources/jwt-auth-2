@@ -32,13 +32,15 @@ JF -[#green]> JS: Validate the JWT
 Activate JS
 JS -[#green]> JF: Token expired
 Deactivate JS
-JF -[#green]> M: HTTP 401 {"error.jwt.expired"}Deactivate JF
+JF -[#green]> M: HTTP 401 {"error.jwt.expired"}
+Deactivate JF
 M -[#green]> AC: Refresh token request /auth/refresh\n {"refreshToken":"token2"}
 AC -[#green]> JS: Validate the Refresh Token
 Activate JS
 JS -> DB: Retrieve user information
 note left: Database call to retrieve the user secret
-DB -> JS: User informationJS -[#green]> JS: Validate Refresh Token\nwith user secret
+DB -> JS: User information
+JS -[#green]> JS: Validate Refresh Token\nwith user secret
 JS -[#green]> AC: New TokenDeactivate JSAC -[#green]> M: New Token\n{"token": "token1"}
 ... Other requests ...
 
