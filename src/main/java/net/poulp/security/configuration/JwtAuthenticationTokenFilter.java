@@ -20,11 +20,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Optional;
 
 @Component
 public class JwtAuthenticationTokenFilter extends GenericFilterBean {
 
+    public static final String BEARER = "Bearer";
     @Autowired
     private AuthenticationService authenticationService;
 
@@ -37,22 +39,26 @@ public class JwtAuthenticationTokenFilter extends GenericFilterBean {
         final HttpServletRequest request = (HttpServletRequest) servletRequest;
         final HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+        // Assume we have only one Authorization header value
         final Optional<String> token = Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION));
 
         Authentication authentication;
 
-        if(token.isPresent()) {
+        if(token.isPresent() && token.get().startsWith(BEARER)) {
 
-            try {
-                Jws<Claims> claims = jwtTokenService.validateJwtToken(token.get());
-                authentication = authenticationService.getAuthentication(claims);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (ExpiredJwtException exception) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "error.jwt.expired");
-                return;
-            } catch (JwtException exception) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "error.jwt.other");
-            }
+                String bearerToken = token.get().substring(BEARER.length()+1);
+
+                try {
+                    Jws<Claims> claims = jwtTokenService.validateJwtToken(bearerToken);
+                    authentication = authenticationService.getAuthentication(claims);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } catch (ExpiredJwtException exception) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "error.jwt.expired");
+                    return;
+                } catch (JwtException exception) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "error.jwt.invalid");
+                    return;
+                }
 
         }
 

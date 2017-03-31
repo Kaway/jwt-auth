@@ -1,6 +1,7 @@
-@startumlautonumberactor
+@startuml
+autonumber
 
-Client as M
+actor Client as M
 participant "Jwt Filter" as JF #green
 participant "Authentication\nController" as AC
 participant "Demo Controller" as DC
