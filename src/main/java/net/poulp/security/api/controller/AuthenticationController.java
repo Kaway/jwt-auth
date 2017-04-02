@@ -26,7 +26,7 @@ public class AuthenticationController {
     @Autowired
     private JwtTokenService jwtTokenService;
 
-    @PostMapping(value = {"/auth"}, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/auth", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest authenticationRequest) {
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(authenticationRequest.username, authenticationRequest.password);
@@ -40,7 +40,7 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
     }
 
-    @PostMapping(value = "/auth/refresh")
+    @PostMapping(value = "/auth/refresh", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<?> refreshToken(@RequestBody RefreshRequest refreshRequest) {
         try {
             JwtTokens tokens = jwtTokenService.refreshJwtToken(refreshRequest.refreshToken);
