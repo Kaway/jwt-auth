@@ -3,6 +3,7 @@ package net.poulp.security.configuration;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
 import net.poulp.security.service.AuthenticationService;
 import net.poulp.security.service.JwtTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.Optional;
 @Component
 public class JwtAuthenticationTokenFilter extends GenericFilterBean {
 
+    private static final String BEARER = "Bearer";
     @Autowired
     private AuthenticationService authenticationService;
 
@@ -36,27 +38,31 @@ public class JwtAuthenticationTokenFilter extends GenericFilterBean {
         final HttpServletRequest request = (HttpServletRequest) servletRequest;
         final HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+        // Assume we have only one Authorization header value
         final Optional<String> token = Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION));
 
         Authentication authentication;
 
-        if(token.isPresent()) {
+        if(token.isPresent() && token.get().startsWith(BEARER)) {
+
+            String bearerToken = token.get().substring(BEARER.length()+1);
 
             try {
-                Jws<Claims> claims = jwtTokenService.validateJwtToken(token.get());
+                Jws<Claims> claims = jwtTokenService.validateJwtToken(bearerToken);
                 authentication = authenticationService.getAuthentication(claims);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (ExpiredJwtException exception) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "jwt.expired");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "error.jwt.expired");
                 return;
-            } catch (Exception exception) {
-                authentication = null;
+            } catch (JwtException exception) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "error.jwt.invalid");
+                return;
             }
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         chain.doFilter(servletRequest, servletResponse);
-        SecurityContextHolder.getContext().setAuthentication(null); // Clear authentication after process
+        SecurityContextHolder.getContext().setAuthentication(null); // Clean authentication after process
 
     }
 

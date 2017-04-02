@@ -27,9 +27,17 @@ public class AuthenticationController {
     @Autowired
     private JwtTokenService jwtTokenService;
 
+<<<<<<< Updated upstream
     @PostMapping(value = {"/auth"}, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response) {
         Authentication authentication = authenticationService.authenticate(authenticationRequest);
+=======
+    @PostMapping(value = "/auth", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest authenticationRequest) {
+
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(authenticationRequest.username, authenticationRequest.password);
+        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+>>>>>>> Stashed changes
 
         if(authentication != null && authentication.isAuthenticated()) {
             JwtTokens tokens = jwtTokenService.createTokens(authentication);
@@ -39,4 +47,17 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
     }
 
+<<<<<<< Updated upstream
+=======
+    @PostMapping(value = "/auth/refresh", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshRequest refreshRequest) {
+        try {
+            JwtTokens tokens = jwtTokenService.refreshJwtToken(refreshRequest.refreshToken);
+            return ResponseEntity.ok().body(tokens);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
+>>>>>>> Stashed changes
 }
