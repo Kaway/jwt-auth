@@ -25,7 +25,8 @@ import java.util.Optional;
 @Component
 public class JwtAuthenticationTokenFilter extends GenericFilterBean {
 
-    public static final String BEARER = "Bearer";
+    private static final String BEARER = "Bearer";
+
     @Autowired
     private AuthenticationService authenticationService;
 

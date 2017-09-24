@@ -18,7 +18,8 @@ import java.util.Date;
 @Service
 public class JwtTokenServiceImpl implements JwtTokenService {
 
-    public static final String USER_SECRET = "userSecret";
+    private static final String USER_SECRET = "userSecret";
+
     @Value("${token.secret}")
     private String secret;
 
@@ -28,10 +29,12 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     @Override
     public JwtTokens createTokens(Authentication authentication) {
 
-        String token, refreshToken;
+        String token;
+        String refreshToken;
+
         UserDto user = (UserDto) authentication.getPrincipal();
 
-        token = createToken((UserDto) authentication.getPrincipal());
+        token = createToken(user);
         refreshToken = createRefreshToken(user);
 
         return new JwtTokens(token, refreshToken);
@@ -42,9 +45,9 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, secret)
+                .setClaims(buildUserClaims(user))
                 .setExpiration(getTokenExpirationDate(false))
                 .setIssuedAt(new Date())
-                .setClaims(buildUserClaims(user))
                 .compact();
     }
 
@@ -53,9 +56,9 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, secret)
+                .setClaims(buildUserClaims(user))
                 .setExpiration(getTokenExpirationDate(true))
                 .setIssuedAt(new Date())
-                .setClaims(buildUserClaims(user))
                 .compact();
     }
 

@@ -27,7 +27,7 @@ public class AuthenticationController {
     private JwtTokenService jwtTokenService;
 
     @PostMapping(value = "/auth", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest authenticationRequest) {
+    public ResponseEntity authenticate(@RequestBody AuthenticationRequest authenticationRequest) {
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(authenticationRequest.username, authenticationRequest.password);
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
@@ -37,16 +37,16 @@ public class AuthenticationController {
             return ResponseEntity.ok().body(tokens);
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(HttpStatus.UNAUTHORIZED.getReasonPhrase());
     }
 
     @PostMapping(value = "/auth/refresh", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshRequest refreshRequest) {
+    public ResponseEntity refreshToken(@RequestBody RefreshRequest refreshRequest) {
         try {
             JwtTokens tokens = jwtTokenService.refreshJwtToken(refreshRequest.refreshToken);
             return ResponseEntity.ok().body(tokens);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(HttpStatus.UNAUTHORIZED.getReasonPhrase());
         }
     }
 
